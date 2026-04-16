@@ -17,35 +17,39 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html, body {
+  width: 100%;
+  height: 100%;
+}
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
 }
 .player {
   width: 100%;
-  max-width: 480px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 .meta {
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
 }
 .cover {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   border-radius: 8px;
   background: #333;
   object-fit: cover;
@@ -53,20 +57,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 24px;
 }
 .info { flex: 1; min-width: 0; }
 .title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 3px;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -77,8 +81,8 @@ body {
   gap: 10px;
 }
 .btn-play {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--accent);
   border: none;
@@ -91,7 +95,7 @@ body {
 }
 .btn-play:hover { background: var(--accent-hover); }
 .btn-play svg { width: 18px; height: 18px; fill: #fff; }
-.timeline { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.timeline { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .seek {
   -webkit-appearance: none;
   appearance: none;
@@ -117,16 +121,22 @@ body {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+.bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .vol-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
-.vol-icon { font-size: 14px; color: var(--text-muted); }
+.vol-icon { font-size: 13px; color: var(--text-muted); }
 .vol {
   -webkit-appearance: none;
   appearance: none;
-  width: 80px;
+  width: 70px;
   height: 3px;
   border-radius: 2px;
   background: var(--border);
@@ -145,9 +155,7 @@ body {
   font-size: 11px;
   color: var(--accent);
   text-decoration: none;
-  text-align: right;
-  display: block;
-  margin-top: -4px;
+  white-space: nowrap;
 }
 .open-link:hover { text-decoration: underline; }
 </style>
@@ -173,11 +181,13 @@ body {
       </div>
     </div>
   </div>
-  <div class="vol-row">
-    <span class="vol-icon">🔊</span>
-    <input type="range" class="vol" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="音量">
+  <div class="bottom-row">
+    <div class="vol-row">
+      <span class="vol-icon">🔊</span>
+      <input type="range" class="vol" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="音量">
+    </div>
+    <a class="open-link" id="open-link" href="#" target="_blank" rel="noopener">↗ 開く</a>
   </div>
-  <a class="open-link" id="open-link" href="#" target="_blank" rel="noopener">↗ 開く</a>
 </div>
 <audio id="audio"></audio>
 <script>
@@ -204,7 +214,7 @@ body {
   linkEl.href = location.href;
 
   if (cover) {
-    coverEl.innerHTML = `<img src="${cover}" alt="cover" width="64" height="64" style="border-radius:8px;object-fit:cover;width:64px;height:64px;display:block;">`;
+    coverEl.innerHTML = `<img src="${cover}" alt="cover" width="52" height="52" style="border-radius:8px;object-fit:cover;width:52px;height:52px;display:block;">`;
   }
 
   audio.src = track;
@@ -216,19 +226,15 @@ body {
     return `${m}:${s}`;
   };
 
-  const playIcon = '<path d="M8 5v14l11-7z"/>';
+  const playIcon  = '<path d="M8 5v14l11-7z"/>';
   const pauseIcon = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 
   btnPlay.addEventListener('click', () => {
     if (audio.paused) { audio.play(); } else { audio.pause(); }
   });
 
-  audio.addEventListener('play', () => {
-    document.getElementById('icon-play').innerHTML = pauseIcon;
-  });
-  audio.addEventListener('pause', () => {
-    document.getElementById('icon-play').innerHTML = playIcon;
-  });
+  audio.addEventListener('play',  () => { document.getElementById('icon-play').innerHTML = pauseIcon; });
+  audio.addEventListener('pause', () => { document.getElementById('icon-play').innerHTML = playIcon; });
   audio.addEventListener('loadedmetadata', () => {
     seek.max = audio.duration;
     timeDur.textContent = fmt(audio.duration);
@@ -237,12 +243,8 @@ body {
     seek.value = audio.currentTime;
     timeCur.textContent = fmt(audio.currentTime);
   });
-  seek.addEventListener('input', () => {
-    audio.currentTime = parseFloat(seek.value);
-  });
-  vol.addEventListener('input', () => {
-    audio.volume = parseFloat(vol.value);
-  });
+  seek.addEventListener('input', () => { audio.currentTime = parseFloat(seek.value); });
+  vol.addEventListener('input',  () => { audio.volume = parseFloat(vol.value); });
 })();
 </script>
 </body>
