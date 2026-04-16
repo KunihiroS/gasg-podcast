@@ -6,90 +6,62 @@
 <title>GASG Podcast Player</title>
 <style>
 :root {
-  --bg: #0D0F14;
-  --surface: #161B24;
-  --border: #252D3A;
-  --text: #E6EDF3;
-  --text-muted: #6E7A8A;
-  --accent: #3EAEB0;
-  --accent-dim: rgba(62, 174, 176, 0.18);
-  --accent-glow: rgba(62, 174, 176, 0.35);
-  --radius: 14px;
+  --bg: #1c1b19;
+  --surface: #252422;
+  --border: #393836;
+  --text: #cdccca;
+  --text-muted: #797876;
+  --accent: #4f98a3;
+  --accent-hover: #227f8b;
+  --radius: 12px;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
-*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html, body { width:100%; height:100%; }
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   display: flex;
   align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
 }
 .player {
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 18px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
-/* --- Meta --- */
 .meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 .cover {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #1A2A3A 0%, #0F1E2E 100%);
-  border: 1px solid var(--border);
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #333;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
-  position: relative;
-  transition: border-color 0.3s;
-}
-.cover svg { width: 22px; height: 22px; }
-/* 再生中パルスリング */
-.cover::before,
-.cover::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 13px;
-  border: 1.5px solid var(--accent);
-  opacity: 0;
-  pointer-events: none;
-}
-.cover::after { inset: -6px; border-radius: 16px; }
-.playing .cover { border-color: var(--accent); }
-.playing .cover::before {
-  animation: pulse-ring 2s ease-out infinite;
-}
-.playing .cover::after {
-  animation: pulse-ring 2s ease-out infinite 0.6s;
-}
-@keyframes pulse-ring {
-  0%   { opacity: 0.6; transform: scale(1); }
-  100% { opacity: 0;   transform: scale(1.3); }
+  font-size: 24px;
 }
 .info { flex: 1; min-width: 0; }
 .title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--text);
 }
 .subtitle {
   font-size: 11px;
@@ -99,15 +71,14 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* --- Controls --- */
 .controls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 .btn-play {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--accent);
   border: none;
@@ -116,102 +87,57 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 0 12px var(--accent-glow);
-  transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
+  transition: background 0.18s;
 }
-.btn-play:hover {
-  box-shadow: 0 0 20px var(--accent-glow);
-  transform: scale(1.06);
-}
-.btn-play:active { transform: scale(0.96); }
-.btn-play svg { width: 16px; height: 16px; fill: #fff; }
-/* 再生中グロー呼吸 */
-.playing .btn-play {
-  animation: glow-breathe 2.4s ease-in-out infinite;
-}
-@keyframes glow-breathe {
-  0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
-  50%       { box-shadow: 0 0 24px var(--accent-glow), 0 0 40px rgba(62,174,176,0.2); }
-}
-.timeline { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.btn-play:hover { background: var(--accent-hover); }
+.btn-play svg { width: 18px; height: 18px; fill: #fff; }
+.timeline { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .seek {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 3px;
+  height: 4px;
   border-radius: 2px;
+  background: var(--border);
   outline: none;
   cursor: pointer;
-  background: linear-gradient(
-    to right,
-    var(--accent) 0%,
-    var(--accent) var(--progress, 0%),
-    var(--border) var(--progress, 0%),
-    var(--border) 100%
-  );
-  position: relative;
-  transition: height 0.15s;
 }
-.seek:hover { height: 5px; }
 .seek::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
-  box-shadow: 0 0 6px var(--accent-glow);
-  transition: transform 0.15s;
-}
-.seek:hover::-webkit-slider-thumb { transform: scale(1.2); }
-/* 再生中シマーオーバーレイ */
-.timeline { position: relative; }
-.shimmer {
-  position: absolute;
-  top: 0; left: 0;
-  width: 60px; height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255,255,255,0.35) 50%,
-    transparent 100%
-  );
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.playing .shimmer {
-  opacity: 1;
-  animation: shimmer-move 2s linear infinite;
-}
-@keyframes shimmer-move {
-  0%   { transform: translateX(-60px); }
-  100% { transform: translateX(var(--shimmer-max, 300px)); }
 }
 .time-row {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
 }
-/* --- Bottom row --- */
 .bottom-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
-.left-controls { display: flex; align-items: center; gap: 8px; }
-.vol-row { display: flex; align-items: center; gap: 5px; }
-.vol-icon { color: var(--text-muted); display: flex; align-items: center; }
-.vol-icon svg { width: 13px; height: 13px; }
+.left-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.vol-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vol-icon { font-size: 13px; color: var(--text-muted); }
 .vol {
   -webkit-appearance: none;
   appearance: none;
-  width: 60px;
+  width: 70px;
   height: 3px;
   border-radius: 2px;
   background: var(--border);
@@ -220,107 +146,70 @@ body {
 }
 .vol::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--text-muted);
   cursor: pointer;
-  transition: background 0.2s;
 }
-.vol:hover::-webkit-slider-thumb { background: var(--accent); }
 .btn-speed {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: var(--font);
-  padding: 3px 7px;
-  border-radius: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.18s;
   white-space: nowrap;
-  min-width: 32px;
+  min-width: 38px;
   text-align: center;
-  letter-spacing: 0.02em;
 }
 .btn-speed:hover { border-color: var(--accent); color: var(--accent); }
-.btn-speed.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-dim);
-}
+.btn-speed.active { border-color: var(--accent); color: var(--accent); background: rgba(79,152,163,0.12); }
 .open-link {
-  font-size: 10px;
-  color: var(--text-muted);
+  font-size: 11px;
+  color: var(--accent);
   text-decoration: none;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  transition: color 0.18s;
 }
-.open-link:hover { color: var(--accent); }
-.open-link svg { width: 11px; height: 11px; }
+.open-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <div class="player">
   <div class="meta">
-    <div class="cover" id="cover">
-      <!-- mic icon -->
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="9" y="2" width="6" height="11" rx="3"/>
-        <path d="M5 10a7 7 0 0 0 14 0"/>
-        <line x1="12" y1="19" x2="12" y2="22"/>
-        <line x1="9" y1="22" x2="15" y2="22"/>
-      </svg>
-    </div>
+    <div class="cover" id="cover">🎙️</div>
     <div class="info">
       <div class="title" id="track-title">Loading...</div>
       <div class="subtitle" id="track-subtitle">GASG Podcast</div>
     </div>
   </div>
-
   <div class="controls">
     <button class="btn-play" id="btn-play" aria-label="再生/一時停止">
       <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </button>
     <div class="timeline">
       <input type="range" class="seek" id="seek" min="0" value="0" step="0.1" aria-label="シーク">
-      <div class="shimmer" id="shimmer"></div>
       <div class="time-row">
         <span id="time-cur">0:00</span>
         <span id="time-dur">0:00</span>
       </div>
     </div>
   </div>
-
   <div class="bottom-row">
     <div class="left-controls">
       <div class="vol-row">
-        <span class="vol-icon">
-          <!-- volume icon -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          </svg>
-        </span>
+        <span class="vol-icon">🔊</span>
         <input type="range" class="vol" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="音量">
       </div>
       <button class="btn-speed" id="btn-speed" aria-label="再生速度">1x</button>
     </div>
-    <a class="open-link" id="open-link" href="#" target="_blank" rel="noopener">
-      開く
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-        <polyline points="15 3 21 3 21 9"/>
-        <line x1="10" y1="14" x2="21" y2="3"/>
-      </svg>
-    </a>
+    <a class="open-link" id="open-link" href="#" target="_blank" rel="noopener">↗ 開く</a>
   </div>
 </div>
-
 <audio id="audio"></audio>
 <script>
 (function(){
@@ -347,7 +236,7 @@ body {
   linkEl.href = location.href;
 
   if (cover) {
-    coverEl.innerHTML = '<img src="' + cover + '" alt="cover" width="46" height="46" style="border-radius:10px;object-fit:cover;display:block;">';
+    coverEl.innerHTML = '<img src="' + cover + '" alt="cover" width="52" height="52" style="border-radius:8px;object-fit:cover;width:52px;height:52px;display:block;">';
   }
 
   audio.src = track;
@@ -359,84 +248,15 @@ body {
     return m + ':' + s;
   };
 
-  const updateProgress = () => {
-    const pct = audio.duration ? (audio.currentTime / audio.duration * 100).toFixed(2) + '%' : '0%';
-    seek.style.setProperty('--progress', pct);
-  };
-
-  // --- 再生コントロール ---
-  const player   = document.querySelector('.player');
-  const shimmer  = document.getElementById('shimmer');
   const playIcon  = '<path d="M8 5v14l11-7z"/>';
   const pauseIcon = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 
-  // --- Web Audio API: 音量連動グロー ---
-  let audioCtx = null, analyser = null, rafId = null;
-
-  const initAnalyser = () => {
-    if (audioCtx) return;
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.75;
-      const src = audioCtx.createMediaElementSource(audio);
-      src.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    } catch(e) { console.warn('AudioContext init failed', e); }
-  };
-
-  const startGlow = () => {
-    if (!analyser) return;
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    const loop = () => {
-      analyser.getByteFrequencyData(data);
-      // 低域(bass)重視で迫力のある反応に
-      const bass = data.slice(0, 8).reduce((a, b) => a + b, 0) / 8;
-      const mid  = data.slice(8, 40).reduce((a, b) => a + b, 0) / 32;
-      const level = Math.min(1, (bass * 0.65 + mid * 0.35) / 160);
-
-      const outerPx  = 8  + level * 28;
-      const innerPx  = 4  + level * 10;
-      const outerA   = 0.15 + level * 0.55;
-      const innerA   = 0.05 + level * 0.2;
-      const borderA  = 0.25 + level * 0.75;
-
-      player.style.boxShadow  =
-        `0 0 ${outerPx}px rgba(62,174,176,${outerA.toFixed(2)}), ` +
-        `inset 0 0 ${innerPx}px rgba(62,174,176,${innerA.toFixed(2)})`;
-      player.style.borderColor = `rgba(62,174,176,${borderA.toFixed(2)})`;
-
-      rafId = requestAnimationFrame(loop);
-    };
-    loop();
-  };
-
-  const stopGlow = () => {
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    player.style.boxShadow  = '';
-    player.style.borderColor = '';
-  };
-
-  const setPlaying = (playing) => {
-    player.classList.toggle('playing', playing);
-    document.getElementById('icon-play').innerHTML = playing ? pauseIcon : playIcon;
-    if (playing) {
-      const w = seek.offsetWidth;
-      shimmer.style.setProperty('--shimmer-max', w + 'px');
-      startGlow();
-    } else {
-      stopGlow();
-    }
-  };
-
   btnPlay.addEventListener('click', () => {
-    initAnalyser();
     if (audio.paused) { audio.play(); } else { audio.pause(); }
   });
 
-  audio.addEventListener('play',  () => setPlaying(true));
-  audio.addEventListener('pause', () => setPlaying(false));
+  audio.addEventListener('play',  () => { document.getElementById('icon-play').innerHTML = pauseIcon; });
+  audio.addEventListener('pause', () => { document.getElementById('icon-play').innerHTML = playIcon; });
   audio.addEventListener('loadedmetadata', () => {
     seek.max = audio.duration;
     timeDur.textContent = fmt(audio.duration);
@@ -444,15 +264,11 @@ body {
   audio.addEventListener('timeupdate', () => {
     seek.value = audio.currentTime;
     timeCur.textContent = fmt(audio.currentTime);
-    updateProgress();
   });
-  seek.addEventListener('input', () => {
-    audio.currentTime = parseFloat(seek.value);
-    updateProgress();
-  });
+  seek.addEventListener('input', () => { audio.currentTime = parseFloat(seek.value); });
+  vol.addEventListener('input',  () => { audio.volume = parseFloat(vol.value); });
 
-  vol.addEventListener('input', () => { audio.volume = parseFloat(vol.value); });
-
+  // 倉速ボタン: 1x → 1.5x → 2x → 1x 循環
   const speeds = [1, 1.5, 2];
   let speedIdx = 0;
   btnSpeed.addEventListener('click', () => {
