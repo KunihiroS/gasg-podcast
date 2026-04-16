@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GASG Podcast Player</title>
+<style>
+:root {
+  --bg: #1c1b19;
+  --surface: #252422;
+  --border: #393836;
+  --text: #cdccca;
+  --text-muted: #797876;
+  --accent: #4f98a3;
+  --accent-hover: #227f8b;
+  --radius: 12px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.player {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: #333;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.info { flex: 1; min-width: 0; }
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-play {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.18s;
+}
+.btn-play:hover { background: var(--accent-hover); }
+.btn-play svg { width: 18px; height: 18px; fill: #fff; }
+.timeline { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.seek {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+.seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.vol-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vol-icon { font-size: 14px; color: var(--text-muted); }
+.vol {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+.vol::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  cursor: pointer;
+}
+.open-link {
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  text-align: right;
+  display: block;
+  margin-top: -4px;
+}
+.open-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="player">
+  <div class="meta">
+    <div class="cover" id="cover">🎙️</div>
+    <div class="info">
+      <div class="title" id="track-title">Loading...</div>
+      <div class="subtitle" id="track-subtitle">GASG Podcast</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn-play" id="btn-play" aria-label="再生/一時停止">
+      <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <div class="timeline">
+      <input type="range" class="seek" id="seek" min="0" value="0" step="0.1" aria-label="シーク">
+      <div class="time-row">
+        <span id="time-cur">0:00</span>
+        <span id="time-dur">0:00</span>
+      </div>
+    </div>
+  </div>
+  <div class="vol-row">
+    <span class="vol-icon">🔊</span>
+    <input type="range" class="vol" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="音量">
+  </div>
+  <a class="open-link" id="open-link" href="#" target="_blank" rel="noopener">↗ 開く</a>
+</div>
+<audio id="audio"></audio>
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const track   = params.get('track')   || 'music/sample.mp3';
+  const title   = params.get('title')   || 'Sample Episode';
+  const sub     = params.get('subtitle')|| 'GASG Podcast';
+  const cover   = params.get('cover')   || '';
+
+  const audio   = document.getElementById('audio');
+  const btnPlay = document.getElementById('btn-play');
+  const seek    = document.getElementById('seek');
+  const vol     = document.getElementById('vol');
+  const timeCur = document.getElementById('time-cur');
+  const timeDur = document.getElementById('time-dur');
+  const coverEl = document.getElementById('cover');
+  const titleEl = document.getElementById('track-title');
+  const subEl   = document.getElementById('track-subtitle');
+  const linkEl  = document.getElementById('open-link');
+
+  titleEl.textContent = title;
+  subEl.textContent   = sub;
+  linkEl.href = location.href;
+
+  if (cover) {
+    coverEl.innerHTML = `<img src="${cover}" alt="cover" width="64" height="64" style="border-radius:8px;object-fit:cover;width:64px;height:64px;display:block;">`;
+  }
+
+  audio.src = track;
+  audio.volume = parseFloat(vol.value);
+
+  const fmt = t => {
+    const m = Math.floor(t/60);
+    const s = Math.floor(t%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  };
+
+  const playIcon = '<path d="M8 5v14l11-7z"/>';
+  const pauseIcon = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+  btnPlay.addEventListener('click', () => {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  });
+
+  audio.addEventListener('play', () => {
+    document.getElementById('icon-play').innerHTML = pauseIcon;
+  });
+  audio.addEventListener('pause', () => {
+    document.getElementById('icon-play').innerHTML = playIcon;
+  });
+  audio.addEventListener('loadedmetadata', () => {
+    seek.max = audio.duration;
+    timeDur.textContent = fmt(audio.duration);
+  });
+  audio.addEventListener('timeupdate', () => {
+    seek.value = audio.currentTime;
+    timeCur.textContent = fmt(audio.currentTime);
+  });
+  seek.addEventListener('input', () => {
+    audio.currentTime = parseFloat(seek.value);
+  });
+  vol.addEventListener('input', () => {
+    audio.volume = parseFloat(vol.value);
+  });
+})();
+</script>
+</body>
+</html>

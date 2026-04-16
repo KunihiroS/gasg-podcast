@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GASG Podcast</title>
+<style>
+:root {
+  --bg: #1c1b19;
+  --surface: #252422;
+  --border: #393836;
+  --text: #cdccca;
+  --text-muted: #797876;
+  --accent: #4f98a3;
+  --font: 'Inter', -apple-system, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  padding:32px 16px;
+}
+.container{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:700;margin-bottom:6px;}
+.desc{font-size:13px;color:var(--text-muted);margin-bottom:28px;}
+.episode{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-bottom:16px;
+}
+.ep-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+.ep-meta{font-size:12px;color:var(--text-muted);margin-bottom:12px;}
+.ep-player iframe{
+  width:100%;height:100px;
+  border:none;
+  border-radius:8px;
+  overflow:hidden;
+}
+.embed-code{margin-top:10px;}
+.embed-code summary{font-size:11px;color:var(--accent);cursor:pointer;}
+.embed-code pre{
+  margin-top:6px;
+  background:#111;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px;
+  font-size:11px;
+  overflow-x:auto;
+  white-space:pre-wrap;
+  color:#9cdcfe;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎙️ GASG Podcast</h1>
+  <p class="desc">エピソード一覧 - 各エピソードのプレイヤーを外部サイトに埋め込めます</p>
+  <div id="episodes"></div>
+</div>
+<script>
+const BASE = location.origin + location.pathname.replace('index.html','');
+const PLAYER = BASE + 'embed-player.html';
+
+const episodes = [
+  {
+    title: 'サンプルエピソード 1',
+    date: '2026-04-16',
+    track: 'music/sample.mp3',
+    subtitle: 'GASG Podcast'
+  }
+];
+
+const container = document.getElementById('episodes');
+
+episodes.forEach(ep => {
+  const params = new URLSearchParams({
+    track: BASE + ep.track,
+    title: ep.title,
+    subtitle: ep.subtitle
+  });
+  const iframeSrc = PLAYER + '?' + params.toString();
+  const embedCode = `<iframe src="${iframeSrc}" width="480" height="100" frameborder="0" style="border-radius:12px;"></iframe>`;
+
+  const div = document.createElement('div');
+  div.className = 'episode';
+  div.innerHTML = `
+    <div class="ep-title">${ep.title}</div>
+    <div class="ep-meta">${ep.date}</div>
+    <div class="ep-player">
+      <iframe src="${iframeSrc}" height="100" frameborder="0" loading="lazy"></iframe>
+    </div>
+    <details class="embed-code">
+      <summary>埋め込みコードをコピー</summary>
+      <pre>${embedCode.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+    </details>
+  `;
+  container.appendChild(div);
+});
+</script>
+</body>
+</html>
