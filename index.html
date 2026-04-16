@@ -34,7 +34,7 @@ h1{font-size:22px;font-weight:700;margin-bottom:6px;}
 .ep-title{font-size:15px;font-weight:600;margin-bottom:4px;}
 .ep-meta{font-size:12px;color:var(--text-muted);margin-bottom:12px;}
 .ep-player iframe{
-  width:100%;height:100px;
+  width:100%;height:160px;
   border:none;
   border-radius:8px;
   overflow:hidden;
@@ -52,6 +52,16 @@ h1{font-size:22px;font-weight:700;margin-bottom:6px;}
   white-space:pre-wrap;
   color:#9cdcfe;
 }
+.copy-btn{
+  margin-top:6px;
+  font-size:11px;
+  padding:4px 10px;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -66,10 +76,10 @@ const PLAYER = BASE + 'embed-player.html';
 
 const episodes = [
   {
-    title: 'サンプルエピソード 1',
+    title: 'AI時代の優位性をつくる小さいコミュニティ',
     date: '2026-04-16',
-    track: 'music/sample.mp3',
-    subtitle: 'GASG Podcast'
+    track: 'music/ep01.mp3',
+    subtitle: 'GASG 2025年度活動振り返りと2026年度の展望'
   }
 ];
 
@@ -82,19 +92,20 @@ episodes.forEach(ep => {
     subtitle: ep.subtitle
   });
   const iframeSrc = PLAYER + '?' + params.toString();
-  const embedCode = `<iframe src="${iframeSrc}" width="480" height="100" frameborder="0" style="border-radius:12px;"></iframe>`;
+  const embedCode = `<iframe src="${iframeSrc}" width="100%" height="160" frameborder="0" style="border-radius:12px;display:block;"></iframe>`;
 
   const div = document.createElement('div');
   div.className = 'episode';
   div.innerHTML = `
     <div class="ep-title">${ep.title}</div>
-    <div class="ep-meta">${ep.date}</div>
+    <div class="ep-meta">${ep.date} &nbsp;|&nbsp; ${ep.subtitle}</div>
     <div class="ep-player">
-      <iframe src="${iframeSrc}" height="100" frameborder="0" loading="lazy"></iframe>
+      <iframe src="${iframeSrc}" height="160" frameborder="0" loading="lazy"></iframe>
     </div>
     <details class="embed-code">
       <summary>埋め込みコードをコピー</summary>
-      <pre>${embedCode.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+      <pre id="code-${ep.track}">${embedCode.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${embedCode.replace(/`/g,'\\`')}\`).then(()=>this.textContent='コピーしました！').catch(()=>this.textContent='手動でコピーしてください')">コードをコピー</button>
     </details>
   `;
   container.appendChild(div);
